@@ -195,7 +195,7 @@ rule ciftify:
     resources:
         mem_mb = 16000,
         time = 1440
-    log: bids(root='logs',suffix='fmriprep.log',**inputs.input_wildcards['uni'])
+    log: bids(root='logs',suffix='ciftify.log',**inputs.input_wildcards['uni'])
     shell:
         """
         ciftify_recon_all \
@@ -205,8 +205,8 @@ rule ciftify:
         --fs-license {input.fs_license} \
         sub-{wildcards.subject} &> {log}
 
-        ciftify_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
-        ciftify_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
+        cifti_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
+        cifti_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
         """
 
 rule all:

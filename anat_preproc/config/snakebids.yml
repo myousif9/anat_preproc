@@ -131,11 +131,8 @@ parse_args:
 
 #singularity containers
 singularity:
-    synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif' #'docker://freesurfer/synthstrip:1.2'
-    # freesurfer: '/scratch/myousif9/containers/freesurfer_7.2.0.sif' #'docker://freesurfer/freesurfer:7.2.0'
-    # fastsurfer: '/scratch/myousif9/containers/fastsurfer_gpu-v1.1.1.sif' #docker://deepmi/fastsurfer:gpu-v1.1.1
     afni: '/scratch/myousif9/containers/afni_make_build_latest.sif' #'docker://afni/afni_make_build:AFNI_22.2.10'
+    ciftify: '/scratch/myousif9/containers/ciftify_0.1.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
     fmriprep: '/scratch/myousif9/containers/fmriprep_22.0.1.sif' #'docker://nipreps/fmriprep:22.0.1'
-    ciftify: '/scratch/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
-    # smriprep: '/scratch/myousif9/containers/smriprep_0.9.2.sif' #'docker://nipreps/smriprep:0.9.2'
+    synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif' #'docker://freesurfer/synthstrip:1.2'
 
