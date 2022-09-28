@@ -1,0 +1,3 @@
+[submodule "anat_preproc/3dMPRAGEise"]
+	path = anat_preproc/3dMPRAGEise
+	url = https://github.com/myousif9/3dMPRAGEise
