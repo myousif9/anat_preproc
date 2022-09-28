@@ -1,0 +1,23 @@
+{
+    "Name": "anat_preproc - My template snakebids app.",
+    "BIDSVersion": "1.4.0",
+    "DatasetType": "derivative",
+    "PipelineDescription":
+        {
+            "Name": "anat_preproc",
+            "Version": "0.1.0",
+            "CodeURL": "http://github.com/myousif9/anat_preproc",
+            "Author": "Mohamed Yousif",
+            "AuthorEmail": "myousif9@uwo.ca"
+        },
+    "GeneratedBy": [
+        {
+            "Name": "anat_preproc",
+            "Version": "0.1.0",
+            "CodeURL": "http://github.com/myousif9/anat_preproc",
+            "Author": "Mohamed Yousif",
+            "AuthorEmail": "myousif9@uwo.ca"
+ 
+        }
+    ]
+}

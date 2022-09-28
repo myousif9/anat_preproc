@@ -1,0 +1,246 @@
+#---- begin snakebids boilerplate ----------------------------------------------
+
+import snakebids
+from snakebids import bids
+from os.path import join
+import os
+
+configfile: workflow.source_path('../config/snakebids.yml')
+
+# Get input wildcards
+inputs = snakebids.generate_inputs(
+    bids_dir=config["bids_dir"],
+    pybids_inputs=config["pybids_inputs"],
+    pybids_database_dir=config.get("pybids_db_dir"),
+    pybids_reset_database=config.get("pybids_db_reset"),
+    derivatives=config.get("derivatives", None),
+    participant_label=config.get("participant_label", None),
+    exclude_participant_label=config.get("exclude_participant_label", None),
+    use_bids_inputs=True,
+)
+
+
+
+#this adds constraints to the bids naming
+wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
+
+#---- end snakebids boilerplate ------------------------------------------------
+
+rule mprageise:
+    input:
+        uni = inputs.input_path['uni'],
+        inv2 = inputs.input_path['inv2'],
+    params:
+        presurfer_script = join(workflow.basedir,'../workflow/scripts/3dMPRAGEise/3dMPRAGEise')
+    output: 
+        mprageised_uni = bids(
+            root = 'derivatives/3dmprageise',
+            datatype = 'anat',
+            desc = 'mprageise',
+            suffix = 'T1w.nii.gz',
+            **inputs.input_wildcards['uni']
+        ),
+    container: config['singularity']['afni']
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 180, 
+    log: bids(root='logs',suffix='3dmprageise.log',**inputs.input_wildcards['uni'])  
+    shell:
+        """
+        bash {params.presurfer_script} -i {input.inv2} -u {input.uni} -f {output.mprageised_uni} &> {log}
+        """
+    
+rule synthstrip_uni:
+    input:
+        mprageised_uni = rules.mprageise.output.mprageised_uni,
+    params:
+        container_path = config['singularity']['synthstrip'],
+        synthstrip_script = join(workflow.basedir,'../workflow/scripts/synthstrip-singularity')
+    output: 
+        uni_skstrip = bids(
+            root = 'derivatives/synthstrip',
+            datatype = 'anat',
+            desc = 'synthstrip',
+            suffix = 'T1w.nii.gz',
+            **inputs.input_wildcards['uni']
+        ),
+        uni_mask = bids(
+            root = 'derivatives/synthstrip',
+            datatype = 'anat',
+            space = 'T1w',
+            suffix = 'brainmask.nii.gz',
+            **inputs.input_wildcards['uni']
+        ),
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 180 
+    log: 
+        uni = bids(root='logs',suffix='synthstrip.log',**inputs.input_wildcards['uni']),
+    shell:
+        """
+        python {params.synthstrip_script} {params.container_path} -i {input.mprageised_uni} -o {output.uni_skstrip} -m {output.uni_mask} &> {log}
+        """  
+
+# rule synthstrip_t2w:
+#     input:
+#         t2w = inputs.input_path['t2w'],
+#     params:
+#         container_path = config['singularity']['synthstrip'],
+#         synthstrip_script = join(workflow.basedir,'../workflow/scripts/synthstrip-singularity')
+#     output: 
+#         t2w_skstrip = bids(
+#             root = 'derivatives/synthstrip',
+#             datatype = 'anat',
+#             desc = 'synthstrip',
+#             suffix = 'T2w.nii.gz',
+#             **inputs.input_wildcards['t2w']
+#         ),
+#         t2w_mask = bids(
+#             root = 'derivatives/synthstrip',
+#             datatype = 'anat',
+#             space = 'T2w',
+#             suffix = 'brainmask.nii.gz',
+#             **inputs.input_wildcards['t2w']
+#         ),
+#     group: 'subj'
+#     threads: 8
+#     resources:
+#         mem_mb = 16000,
+#         time = 180 
+#     log: 
+#         bids(root='logs',suffix='synthstrip.log',**inputs.input_wildcards['t2w'])
+#     shell:
+#         """
+#         python {params.synthstrip_script} {params.container_path} -i {input.t2w} -o {output.t2w_skstrip} -m {output.t2w_mask} &> {log}
+#         """ 
+
+
+rule fmriprep:
+    input:
+        t1w = rules.synthstrip_uni.output.uni_skstrip,
+        # t2w = rules.synthstrip_t2w.output.t2w_skstrip,
+        fs_license = os.environ['FS_LICENSE'] if config['fs_license'] == False else config['fs_license'],
+    params:
+        synthstrip_dir =bids(
+            root = 'derivatives',
+            suffix = 'synthstrip'
+        ),
+        fmriprep_outdir = bids(
+            root = 'derivatives',
+            suffix = 'fmriprep'
+        ),
+        freesurfer_dir = bids(
+            root = 'derivatives',
+            suffix = 'freesurfer'
+        ),
+        dataset_description = join(workflow.basedir,'../resources/dataset_description.json'),
+        work_directory = bids(
+            root = 'work',
+            suffix = 'fmriprep',
+        ),
+        container = config['singularity']['fmriprep'],
+    output: 
+        done = touch(bids(
+            root = 'work',
+            suffix = 'fmriprep.done',
+            **inputs.input_wildcards['uni']
+        ))
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 1440
+    log: bids(root='logs',suffix='fmriprep.log',**inputs.input_wildcards['uni'])
+    shell:
+        """
+        cp -n {params.dataset_description} {params.synthstrip_dir}
+        mkdir -p {params.work_directory}
+        mkdir -p {params.fmriprep_outdir}
+
+        singularity run --cleanenv \
+        -B {params.synthstrip_dir}:/data \
+        -B {params.fmriprep_outdir}:/out \
+        -B {params.work_directory}:/work \
+        -B {input.fs_license}:/opt/freesurfer/license.txt \
+        {params.container} /data {params.fmriprep_outdir} participant --participant_label {wildcards.subject} --skip_bids_validation --skull-strip-t1w skip --anat-only -w /work &> {log}
+        """
+
+rule ciftify:
+    input: 
+        fmriprep_done =  rules.fmriprep.output.done,
+        fs_license = os.environ['FS_LICENSE'] if config['fs_license'] == False else config['fs_license'],
+    params:
+        container = config['singularity']['ciftify'],
+        freesurfer_dir = bids(
+            root = 'derivatives/fmriprep/sourcedata',
+            suffix = 'freesurfer'
+        ),
+        ciftify_outdir = bids(
+            root = 'derivatives',
+            suffix = 'ciftify'
+        ),
+    output: 
+        done = touch(bids(
+            root = 'work',
+            suffix = 'ciftify.done',
+            **inputs.input_wildcards['uni']
+        )),
+    container: config['singularity']['ciftify']
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 1440
+    log: bids(root='logs',suffix='fmriprep.log',**inputs.input_wildcards['uni'])
+    shell:
+        """
+        ciftify_recon_all \
+        --resample-to-T1w32k \
+        --ciftify-work-dir {params.ciftify_outdir} \
+        --fs-subjects-dir {params.freesurfer_dir} \
+        --fs-license {input.fs_license} \
+        sub-{wildcards.subject} &> {log}
+
+        ciftify_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
+        ciftify_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
+        """
+
+rule all:
+    input:
+        expand(
+            expand(
+                rules.synthstrip_uni.output.uni_skstrip,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists['uni']
+        ),
+        # expand(
+        #     expand(
+        #         rules.synthstrip_t2w.output.t2w_skstrip,
+        #         allow_missing=True,
+        #     ),
+        #     zip,
+        #     **inputs.input_zip_lists['t2w']
+        # ),
+        expand(
+            expand(
+                rules.fmriprep.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists['uni']
+        ),
+        expand(
+            expand(
+                rules.ciftify.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists['uni']
+        ),
+    default_target: True
