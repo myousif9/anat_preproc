@@ -169,12 +169,11 @@ rule fmriprep:
         {params.container} /data {params.fmriprep_outdir} participant --participant_label {wildcards.subject} --skip_bids_validation --skull-strip-t1w skip --anat-only -w /work &> {log}
         """
 
-rule ciftify:
+rule ciftify_recon_all:
     input: 
         fmriprep_done =  rules.fmriprep.output.done,
         fs_license = os.environ['FS_LICENSE'] if config['fs_license'] == False else config['fs_license'],
     params:
-        container = config['singularity']['ciftify'],
         freesurfer_dir = bids(
             root = 'derivatives/fmriprep/sourcedata',
             suffix = 'freesurfer'
@@ -195,19 +194,37 @@ rule ciftify:
     resources:
         mem_mb = 16000,
         time = 1440
-    log: bids(root='logs',suffix='ciftify.log',**inputs.input_wildcards['uni'])
+    log: bids(root='logs',suffix='ciftifyreconall.log',**inputs.input_wildcards['uni'])
     shell:
         """
-        ciftify_recon_all \
-        --resample-to-T1w32k \
-        --ciftify-work-dir {params.ciftify_outdir} \
-        --fs-subjects-dir {params.freesurfer_dir} \
-        --fs-license {input.fs_license} \
-        sub-{wildcards.subject} &> {log}
-
-        cifti_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
-        cifti_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
+        ciftify_recon_all --resample-to-T1w32k --ciftify-work-dir '{params.ciftify_outdir}' --fs-subjects-dir '{params.freesurfer_dir}' --fs-license '{input.fs_license}' --n_cpus '{threads}' 'sub-{wildcards.subject}' &> {log}
+        cifti_vis_recon_all subject --ciftify-work-dir '{params.ciftify_outdir}' 'sub-{wildcards.subject}' &> {log}
+        cifti_vis_recon_all index --ciftify-work-dir '{params.ciftify_outdir}' &> {log}
         """
+
+# rule ciftify_viz:
+#     input:
+#          ciftify_recon_all_done =  rules.ciftify_recon_all.output.done,
+#     params:
+#         ciftify_outdir = bids(
+#             root = 'derivatives',
+#             suffix = 'ciftify'
+#         ),
+#     output: 
+#         done = touch(bids(
+#             root = 'work',
+#             suffix = 'ciftifyvis.done',
+#             **inputs.input_wildcards['uni']
+#         )),
+#     container: config['singularity']['ciftify']
+#     group: 'subj'
+#     log: bids(root='logs',suffix='ciftifyvis.log',**inputs.input_wildcards['uni'])
+#     shell:
+#         """
+#         cifti_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
+        
+#         cifti_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
+#         """
 
 rule all:
     input:
@@ -237,10 +254,19 @@ rule all:
         ),
         expand(
             expand(
-                rules.ciftify.output.done,
+                rules.ciftify_recon_all.output.done,
                 allow_missing=True,
             ),
             zip,
             **inputs.input_zip_lists['uni']
         ),
+        # expand(
+        #     expand(
+        #         rules.ciftify_viz.output.done,
+        #         allow_missing=True,
+        #     ),
+        #     zip,
+        #     **inputs.input_zip_lists['uni']
+        # ),
+
     default_target: True

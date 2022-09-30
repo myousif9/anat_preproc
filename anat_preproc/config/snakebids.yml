@@ -132,7 +132,7 @@ parse_args:
 #singularity containers
 singularity:
     afni: '/scratch/myousif9/containers/afni_make_build_latest.sif' #'docker://afni/afni_make_build:AFNI_22.2.10'
-    ciftify: '/scratch/myousif9/containers/ciftify_0.1.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
+    ciftify: '/scratch/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
     fmriprep: '/scratch/myousif9/containers/fmriprep_22.0.1.sif' #'docker://nipreps/fmriprep:22.0.1'
     synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif' #'docker://freesurfer/synthstrip:1.2'
 
