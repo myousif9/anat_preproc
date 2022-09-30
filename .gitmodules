@@ -1,3 +1,2 @@
-[submodule "3dMPRAGEise"]
-	path = anat_preproc/anat_preproc/workflow/scripts/3dMPRAGEise
-	url = https://github.com/myousif9/3dMPRAGEise
+[submodule "https://github.com/myousif9/3dMPRAGEise"]
+	url = anat_preproc/workflow/scripts/3dMPRAGEise/
