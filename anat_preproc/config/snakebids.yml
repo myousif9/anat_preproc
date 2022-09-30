@@ -115,13 +115,13 @@ parse_args:
  # custom command-line parameters can then be added, these will get added to the config
  # below is an example to override config['bet_frac']
   --fs_license:
-    help:
+    help: 'Provide path to freesurfer license text file.'
     default: False
     required: False
     nargs: 1
   
   --use_t2:
-    help:
+    help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
     default: False
     required: False
 
@@ -131,8 +131,8 @@ parse_args:
 
 #singularity containers
 singularity:
-    afni: '/scratch/myousif9/containers/afni_make_build_latest.sif' #'docker://afni/afni_make_build:AFNI_22.2.10'
-    ciftify: '/scratch/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
-    fmriprep: '/scratch/myousif9/containers/fmriprep_22.0.1.sif' #'docker://nipreps/fmriprep:22.0.1'
-    synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif' #'docker://freesurfer/synthstrip:1.2'
+    afni: 'docker://afni/afni_make_build:AFNI_22.2.10'
+    ciftify: 'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3'
+    fmriprep: 'docker://nipreps/fmriprep:22.0.1'
+    synthstrip: 'docker://freesurfer/synthstrip:1.2'
 

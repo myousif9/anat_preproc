@@ -202,30 +202,6 @@ rule ciftify_recon_all:
         cifti_vis_recon_all index --ciftify-work-dir '{params.ciftify_outdir}' &> {log}
         """
 
-# rule ciftify_viz:
-#     input:
-#          ciftify_recon_all_done =  rules.ciftify_recon_all.output.done,
-#     params:
-#         ciftify_outdir = bids(
-#             root = 'derivatives',
-#             suffix = 'ciftify'
-#         ),
-#     output: 
-#         done = touch(bids(
-#             root = 'work',
-#             suffix = 'ciftifyvis.done',
-#             **inputs.input_wildcards['uni']
-#         )),
-#     container: config['singularity']['ciftify']
-#     group: 'subj'
-#     log: bids(root='logs',suffix='ciftifyvis.log',**inputs.input_wildcards['uni'])
-#     shell:
-#         """
-#         cifti_vis_recon_all subject --ciftify-work-dir {params.ciftify_outdir} sub-{wildcards.subject} &> {log}
-        
-#         cifti_vis_recon_all index --ciftify-work-dir {params.ciftify_outdir} &> {log}
-#         """
-
 rule all:
     input:
         expand(
@@ -260,13 +236,5 @@ rule all:
             zip,
             **inputs.input_zip_lists['uni']
         ),
-        # expand(
-        #     expand(
-        #         rules.ciftify_viz.output.done,
-        #         allow_missing=True,
-        #     ),
-        #     zip,
-        #     **inputs.input_zip_lists['uni']
-        # ),
 
     default_target: True
