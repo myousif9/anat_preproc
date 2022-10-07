@@ -5,7 +5,9 @@ Snakebids pipeline for anatomical preprocessing with [3dMPRAGEise](10.5281/zenod
 
 ![Pipeline desctiption](docs/images/anat_preproc_pipeline.png)
 
-### Inputs
+Inputs
+=======
+
 - Bids dataset with:
   - MP2RAGE data (uni and inv2)
   - T2w (optional and currently doesn't work)
