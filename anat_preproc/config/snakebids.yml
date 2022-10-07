@@ -126,10 +126,10 @@ parse_args:
     required: False
     nargs: 1
 
-  --use_t2:
-    help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
-    default: False
-    required: False
+  # --use_t2:
+  #   help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
+  #   default: False
+  #   required: False
 
 
 #--- workflow specific configuration -- below is just an example:
@@ -137,9 +137,9 @@ parse_args:
 
 #singularity containers
 singularity:
-    afni: '/scratch/myousif9/containers/afni_make_build_latest.sif' #'docker://afni/afni_make_build:AFNI_22.2.10'
-    ciftify: '/scratch/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif' #'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3' #'docker://tigrlab/ciftify:0.1'
-    fmriprep: '/scratch/myousif9/containers/fmriprep_22.0.1.sif' #'docker://nipreps/fmriprep:22.0.1'
-    gradcorrect:  '/scratch/myousif9/containers/gradcorrect_v0.0.3a.sif' #'docker://khanlab/gradcorrect:v0.0.3a'
-    synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif' #'docker://freesurfer/synthstrip:1.2'
+    afni: 'docker://afni/afni_make_build:AFNI_22.2.10'
+    ciftify: 'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3' 
+    fmriprep: 'docker://nipreps/fmriprep:22.0.1'
+    gradcorrect: 'docker://khanlab/gradcorrect:v0.0.3a'
+    synthstrip: 'docker://freesurfer/synthstrip:1.2'
 
