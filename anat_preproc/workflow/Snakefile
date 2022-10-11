@@ -111,6 +111,7 @@ rule fmriprep:
             root = 'work',
             suffix = 'fmriprep',
         ),
+        fmriprep_opts = config['fmriprep_opts'],
         container = config['singularity']['fmriprep'],
     output: 
         done = touch(bids(
@@ -135,7 +136,9 @@ rule fmriprep:
         -B {params.fmriprep_outdir}:/out \
         -B {params.work_directory}:/work \
         -B {input.fs_license}:/opt/freesurfer/license.txt \
-        {params.container} /data {params.fmriprep_outdir} participant --participant_label {wildcards.subject} --skip_bids_validation --skull-strip-t1w skip --anat-only -w /work &> {log}
+        {params.container} /data {params.fmriprep_outdir} participant \
+        --participant_label {wildcards.subject} --skip_bids_validation --skull-strip-t1w skip -w /work \
+        {params.fmriprep_opts} &> {log}
         """
 
 rule ciftify_recon_all:
@@ -151,6 +154,7 @@ rule ciftify_recon_all:
             root = 'derivatives',
             suffix = 'ciftify'
         ),
+        ciftify_opts = config['ciftify_opts'],
     output: 
         done = touch(bids(
             root = 'work',
@@ -166,7 +170,7 @@ rule ciftify_recon_all:
     log: bids(root='logs',suffix='ciftifyreconall.log',**inputs.input_wildcards['uni'])
     shell:
         """
-        ciftify_recon_all --resample-to-T1w32k --ciftify-work-dir '{params.ciftify_outdir}' --fs-subjects-dir '{params.freesurfer_dir}' --fs-license '{input.fs_license}' --n_cpus '{threads}' 'sub-{wildcards.subject}' &> {log}
+        ciftify_recon_all {params.ciftify_opts} --ciftify-work-dir '{params.ciftify_outdir}' --fs-subjects-dir '{params.freesurfer_dir}' --fs-license '{input.fs_license}' --n_cpus '{threads}' 'sub-{wildcards.subject}' &> {log}
         cifti_vis_recon_all subject --ciftify-work-dir '{params.ciftify_outdir}' 'sub-{wildcards.subject}' &> {log}
         cifti_vis_recon_all index --ciftify-work-dir '{params.ciftify_outdir}' &> {log}
         """

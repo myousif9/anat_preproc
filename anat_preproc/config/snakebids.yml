@@ -125,6 +125,18 @@ parse_args:
     default: 'none'
     required: False
     nargs: 1
+  
+  --fmriprep_opts:
+    help: 'Provide custom fmriprep arguments flags.'
+    default: '--anat-only'
+    required: False
+    nargs: '+'
+  
+  --ciftify_opts:
+    help: 'Provide custom ciftify_recon_all command argument flags.'
+    default: '--resample-to-T1w32k'
+    required: False
+    nargs: '+'
 
   # --use_t2:
   #   help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
