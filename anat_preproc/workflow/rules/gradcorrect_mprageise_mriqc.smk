@@ -26,6 +26,32 @@ rule grad_correction:
             {params.gradcorrect_script} {input.bids_dir} {params.grad_corr_dir} participant --grad_coeff_file {input.grad_coef_file} --participant_label {wildcards.subject} &> {log}
             """ 
 
+rule mriqc:
+    input:
+        bids_dir = rules.grad_correction.output.done,
+    params:
+        grad_corr_dir = bids(
+                root = 'derivatives',
+                suffix = 'gradcorrect'
+            ),
+        mriqc_dir = bids(
+            root = 'derivatives',
+            suffix = 'mriqc'
+        ),
+    output: 
+        done = touch(bids(
+            root = 'work',
+            suffix = 'mriqc.done',
+            **inputs.input_wildcards['uni']
+        ))
+    group: 'subj'
+    container: config['singularity']['mriqc']
+    log: bids(root='logs',suffix='mriqc.log',**inputs.input_wildcards['uni'])  
+    shell:
+        """
+        mriqc {params.grad_corr_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}
+        """
+
 rule mprageise:
     input:
         gradcorrect_done = rules.grad_correction.output.done,

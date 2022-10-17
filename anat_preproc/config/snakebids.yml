@@ -149,9 +149,16 @@ parse_args:
 
 #singularity containers
 singularity:
+    # afni: '/scratch/myousif9/containers/afni_make_build_latest.sif'
+    # ciftify: '/scratch/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif'
+    # fmriprep: '/scratch/myousif9/containers/fmriprep_22.0.1.sif'
+    # gradcorrect: '/scratch/myousif9/containers/gradcorrect_v0.0.3a.sif'
+    # mriqc: '/scratch/myousif9/containers/mriqc-0.16.1.simg'
+    # synthstrip: '/scratch/myousif9/containers/synthstrip.1.1.sif'
+
     afni: 'docker://afni/afni_make_build:AFNI_22.2.10'
     ciftify: 'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3' 
-    fmriprep: 'docker://nipreps/fmriprep:22.0.1'
+    fmriprep: docker://nipreps/fmriprep:22.0.1'
     gradcorrect: 'docker://khanlab/gradcorrect:v0.0.3a'
+    mriqc: 'docker://poldracklab/mriqc:latest'
     synthstrip: 'docker://freesurfer/synthstrip:1.2'
-
