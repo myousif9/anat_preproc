@@ -124,7 +124,7 @@ parse_args:
   
   --grad_coef:
     help: 'Provide path to gradient correction coefficient file. Gradient correction dis skipped if file is not specified.'
-    default: 'none'
+    default: false
     required: false
     nargs: 1
   
@@ -146,10 +146,10 @@ parse_args:
     action: store_true
     
 
-  # --use_t2:
-  #   help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
-  #   default: False
-  #   required: False
+  --use_t2:
+    help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
+    default: false
+    action: store_true
 
 
 #--- workflow specific configuration -- below is just an example:
