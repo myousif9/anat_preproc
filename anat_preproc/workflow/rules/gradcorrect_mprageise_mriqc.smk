@@ -14,7 +14,7 @@ rule grad_correction:
                 suffix = 'gradcorr.done',
                 **inputs.input_wildcards['uni']
                 ))
-        container: config['singularity']['gradcorrect']
+        container: config['singularity']['graham']['gradcorrect'] if config['graham'] else config['singularity']['docker']['gradcorrect']
         group: 'subj'
         threads: 8
         resources:
@@ -45,7 +45,11 @@ rule mriqc:
             **inputs.input_wildcards['uni']
         ))
     group: 'subj'
-    container: config['singularity']['mriqc']
+    container: config['singularity']['graham']['mriqc'] if config['graham'] else config['singularity']['docker']['mriqc']
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 1440, 
     log: bids(root='logs',suffix='mriqc.log',**inputs.input_wildcards['uni'])  
     shell:
         """
@@ -75,7 +79,7 @@ rule mprageise:
             suffix = 'T1w.nii.gz',
             **inputs.input_wildcards['uni']
         ),
-    container: config['singularity']['afni']
+    container: config['singularity']['graham']['afni'] if config['graham'] else config['singularity']['docker']['afni']
     group: 'subj'
     threads: 8
     resources:

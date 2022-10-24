@@ -19,8 +19,6 @@ inputs = snakebids.generate_inputs(
     use_bids_inputs=True,
 )
 
-
-
 #this adds constraints to the bids naming
 wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
 
@@ -34,7 +32,7 @@ rule synthstrip_uni:
     input:
         mprageised_uni = rules.mprageise.output.mprageised_uni,
     params:
-        container_path = config['singularity']['synthstrip'],
+        container_path = config['singularity']['graham']['synthstrip'] if config['graham'] else config['singularity']['docker']['synthstrip'] ,
         synthstrip_script = join(workflow.basedir,'../workflow/scripts/synthstrip-singularity')
     output: 
         uni_skstrip = bids(
@@ -87,7 +85,7 @@ rule fmriprep:
             suffix = 'fmriprep',
         ),
         fmriprep_opts = config['fmriprep_opts'],
-        container = config['singularity']['fmriprep'],
+        container = config['singularity']['graham']['fmriprep'] if config['graham'] else config['singularity']['docker']['fmriprep'],
     output: 
         done = touch(bids(
             root = 'work',
@@ -136,7 +134,7 @@ rule ciftify_recon_all:
             suffix = 'ciftify.done',
             **inputs.input_wildcards['uni']
         )),
-    container: config['singularity']['ciftify']
+    container: config['singularity']['graham']['ciftify'] if config['graham'] else config['singularity']['docker']['ciftify'] 
     group: 'subj'
     threads: 8
     resources:
@@ -149,6 +147,18 @@ rule ciftify_recon_all:
         cifti_vis_recon_all subject --ciftify-work-dir '{params.ciftify_outdir}' 'sub-{wildcards.subject}' &> {log}
         cifti_vis_recon_all index --ciftify-work-dir '{params.ciftify_outdir}' &> {log}
         """
+
+rule all_skstrip:
+    input:
+        expand(
+            expand(
+                rules.synthstrip_uni.output.uni_skstrip,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists['uni']
+        ),
+    default_target: True
 
 rule all:
     input:
