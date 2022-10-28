@@ -1,16 +1,18 @@
-#---- begin snakebids boilerplate ----------------------------------------------
+# ---- begin snakebids boilerplate ----------------------------------------------
 
 import snakebids
 from snakebids import bids
 from os.path import join
 import os
 
-configfile: workflow.source_path('../config/snakebids.yml')
 
-pybids_in = config['pybids_inputs']
+configfile: workflow.source_path("../config/snakebids.yml")
 
-if config['use_t2'] == False:
-    del pybids_in['t2w']
+
+pybids_in = config["pybids_inputs"]
+
+if config["use_t2"] == False:
+    del pybids_in["t2w"]
 
 # Get input wildcards
 inputs = snakebids.generate_inputs(
@@ -24,24 +26,40 @@ inputs = snakebids.generate_inputs(
     use_bids_inputs=True,
 )
 
-#this adds constraints to the bids naming
-wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
 
-#---- end snakebids boilerplate ------------------------------------------------
+# this adds constraints to the bids naming
+wildcard_constraints:
+    **snakebids.get_wildcard_constraints(config["pybids_inputs"]),
 
-if config['grad_coef'] == False:
-    include: 'rules/mprageise_mriqc.smk'
+
+# ---- end snakebids boilerplate ------------------------------------------------
+
+if config["grad_coef"] == False:
+
+    include: "rules/mprageise_mriqc.smk"
+
+
 else:
-    include: 'rules/gradcorrect_mprageise_mriqc.smk'
 
-include: 'rules/mriqc_synthstrip_t1w.smk'
+    include: "rules/gradcorrect_mprageise_mriqc.smk"
 
-if config['use_t2']:
-    include: 'rules/synthstrip_t2w.smk'
 
-include: 'rules/fmriprep_ciftify.smk'
+include: "rules/mriqc_synthstrip_t1w.smk"
 
-if config['use_t2']:
-    include: 'rules/all_T2w.smk'
+
+if config["use_t2"]:
+
+    include: "rules/synthstrip_t2w.smk"
+
+
+include: "rules/fmriprep_ciftify.smk"
+
+
+if config["use_t2"]:
+
+    include: "rules/all_T2w.smk"
+
+
 else:
-    include: 'rules/all_noT2w.smk'
+
+    include: "rules/all_noT2w.smk"

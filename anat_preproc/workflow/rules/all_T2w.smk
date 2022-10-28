@@ -6,7 +6,7 @@ rule all_skstrip:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -14,7 +14,7 @@ rule all_skstrip:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['t2w']
+            **inputs.input_zip_lists["t2w"]
         ),
         expand(
             expand(
@@ -22,7 +22,7 @@ rule all_skstrip:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -30,9 +30,10 @@ rule all_skstrip:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
     default_target: True
+
 
 rule all:
     input:
@@ -42,7 +43,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -50,7 +51,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['t2w']
+            **inputs.input_zip_lists["t2w"]
         ),
         expand(
             expand(
@@ -58,7 +59,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['t2w']
+            **inputs.input_zip_lists["t2w"]
         ),
         expand(
             expand(
@@ -66,7 +67,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -74,7 +75,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -82,7 +83,7 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(
@@ -90,7 +91,6 @@ rule all:
                 allow_missing=True,
             ),
             zip,
-            **inputs.input_zip_lists['uni']
+            **inputs.input_zip_lists["uni"]
         ),
-
     default_target: True
