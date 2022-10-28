@@ -1,6 +1,8 @@
 anat_preproc
 ============
 
+[![GitHub Super-Linter](https://github.com/myousif9/anat_preproc/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+
 Snakebids pipeline for anatomical preprocessing with [gradcorrect](https://github.com/myousif9/gradcorrect), [3dMPRAGEise](10.5281/zenodo.4626825), [synthstrip](https://doi.org/10.1016/j.neuroimage.2022.119474), [fMRIPrep](https://doi.org/10.1038/s41592-018-0235-4) and [ciftify](https://doi.org/10.5281/zenodo.2586104).
 
 ![Pipeline desctiption](docs/images/anat_preproc_pipeline.png)
