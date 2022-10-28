@@ -7,8 +7,8 @@ rule mriqc2:
                 suffix = '3dmprageise'
             ),
         mriqc_dir = bids(
-            root = 'derivatives',
-            suffix = 'mriqc'
+            root = 'derivatives/mriqc',
+            suffix = 'mriqc_mprageise'
         ),
     output: 
         done = touch(bids(
@@ -21,18 +21,19 @@ rule mriqc2:
     threads: 8
     resources:
         mem_mb = 16000,
-        time = 1440, 
+        time = 180, 
     log: bids(root='logs',suffix='mriqc2.log',**inputs.input_wildcards['uni'])  
     shell:
         """
         mriqc {params.mprageise_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}
+        mriqc {params.mprageise_dir} {params.mriqc_dir} group
         """
 
 rule synthstrip_uni:
     input:
         mprageised_uni = rules.mprageise.output.mprageised_uni,
     params:
-        container_path = config['singularity']['graham']['synthstrip'] if config['graham'] else config['singularity']['docker']['synthstrip'] ,
+        container_path = config['singularity']['graham']['synthstrip'] if config['graham'] else config['singularity']['docker']['synthstrip'],
         synthstrip_script = join(workflow.basedir,'../workflow/scripts/synthstrip-singularity')
     output: 
         uni_skstrip = bids(
@@ -53,7 +54,7 @@ rule synthstrip_uni:
     threads: 8
     resources:
         mem_mb = 16000,
-        time = 1440 
+        time = 180 
     log: 
         uni = bids(root='logs',suffix='synthstrip.log',**inputs.input_wildcards['uni']),
     shell:

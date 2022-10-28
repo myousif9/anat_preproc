@@ -1,7 +1,65 @@
+if config['use_t2']:
+    rule reskstripT2w:
+        input:
+            t2w_mask = rules.synthstrip_t2w.output.t2w_mask
+        params:
+            t2w = inputs.input_path['t2w'] if config['grad_coef'] == False else join('derivatives','gradcorrect',*inputs.input_path['t2w'].replace(config['bids_dir'],'').split(os.sep)),
+            t2w_skstrip = bids(
+                root = 'derivatives/synthstrip',
+                datatype = 'anat',
+                desc = 'synthstrip',
+                suffix = 'T2w.nii.gz',
+                **inputs.input_wildcards['t2w']
+            ),
+        output:
+            done = touch(bids(
+                root = 'work',
+                suffix = 'reskstripT2w.done',
+                **inputs.input_wildcards['t2w']
+            ))
+        container: config['singularity']['graham']['fmriprep'] if config['graham'] else config['singularity']['docker']['fmriprep'],
+        group: 'subj'
+        threads: 8
+        resources:
+            mem_mb = 16000,
+            time = 60 
+        shell: 
+            """
+            fslmaths {params.t2w} -mul {input.t2w_mask} {params.t2w}
+            """
+
+rule reskstripT1w:
+    input:
+        t1w_mask = rules.synthstrip_uni.output.uni_mask
+    params:
+        t1w = rules.mprageise.output.mprageised_uni,
+        uni_skstrip = bids(
+            root = 'derivatives/synthstrip',
+            datatype = 'anat',
+            desc = 'synthstrip',
+            suffix = 'T1w.nii.gz',
+            **inputs.input_wildcards['uni']
+        ),
+    output:
+        done = touch(bids(
+            root = 'work',
+            suffix = 'reskstripT1w.done',
+            **inputs.input_wildcards['uni']
+        ))
+    container: config['singularity']['graham']['fmriprep'] if config['graham'] else config['singularity']['docker']['fmriprep'],
+    group: 'subj'
+    threads: 8
+    resources:
+        mem_mb = 16000,
+        time = 60 
+    shell: 
+        """
+        fslmaths {params.t1w} -mul {input.t1w_mask} {params.uni_skstrip}
+        """
+
 rule fmriprep:
     input:
-        t1w = rules.synthstrip_uni.output.uni_skstrip,
-        # t2w = rules.synthstrip_t2w.output.t2w_skstrip,
+        skstrip_done = rules.reskstripT1w.output.done,
         fs_license = os.environ['FS_LICENSE'] if config['fs_license'] == False else config['fs_license'],
     params:
         synthstrip_dir =bids(

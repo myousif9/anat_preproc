@@ -12,7 +12,7 @@ rule grad_correction:
             done = touch(bids(
                 root='work',
                 suffix = 'gradcorr.done',
-                **inputs.input_wildcards['uni']
+                **inputs.subj_wildcards
                 ))
         container: config['singularity']['graham']['gradcorrect'] if config['graham'] else config['singularity']['docker']['gradcorrect']
         group: 'subj'
@@ -20,7 +20,7 @@ rule grad_correction:
         resources:
             mem_mb = 16000,
             time = 1440
-        log: bids(root='logs',suffix='gradcorrect.log',**inputs.input_wildcards['uni'])
+        log: bids(root='logs',suffix='gradcorrect.log',**inputs.subj_wildcards)
         shell:
             """
             {params.gradcorrect_script} {input.bids_dir} {params.grad_corr_dir} participant --grad_coeff_file {input.grad_coef_file} --participant_label {wildcards.subject} &> {log}
@@ -35,8 +35,8 @@ rule mriqc:
                 suffix = 'gradcorrect'
             ),
         mriqc_dir = bids(
-            root = 'derivatives',
-            suffix = 'mriqc'
+            root = 'derivatives/mriqc',
+            suffix = 'mriqc_gradcorrect'
         ),
     output: 
         done = touch(bids(
@@ -49,11 +49,12 @@ rule mriqc:
     threads: 8
     resources:
         mem_mb = 16000,
-        time = 1440, 
+        time = 180, 
     log: bids(root='logs',suffix='mriqc.log',**inputs.input_wildcards['uni'])  
     shell:
         """
         mriqc {params.grad_corr_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}
+        mriqc {params.grad_corr_dir} {params.mriqc_dir} group
         """
 
 rule mprageise:
@@ -84,7 +85,7 @@ rule mprageise:
     threads: 8
     resources:
         mem_mb = 16000,
-        time = 1440, 
+        time = 180, 
     log: bids(root='logs',suffix='3dmprageise.log',**inputs.input_wildcards['uni'])  
     shell:
         """

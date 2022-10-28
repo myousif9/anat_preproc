@@ -3,8 +3,8 @@ rule mriqc:
         bids_dir = config['bids_dir'],
     params:
         mriqc_dir = bids(
-            root = 'derivatives',
-            suffix = 'mriqc'
+            root = 'derivatives/mriqc',
+            suffix = 'mriqc_gradcorrect'
         ),
     output: 
         done = touch(bids(
@@ -22,6 +22,7 @@ rule mriqc:
     shell:
         """
         mriqc {input.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}
+        mriqc {params.bids_dir} {params.mriqc_dir} group
         """
 
 rule mprageise:

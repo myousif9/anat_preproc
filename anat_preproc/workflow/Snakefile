@@ -7,6 +7,11 @@ import os
 
 configfile: workflow.source_path('../config/snakebids.yml')
 
+pybids_in = config['pybids_inputs']
+
+if config['use_t2'] == False:
+    del pybids_in['t2w']
+
 # Get input wildcards
 inputs = snakebids.generate_inputs(
     bids_dir=config["bids_dir"],
@@ -23,11 +28,12 @@ inputs = snakebids.generate_inputs(
 wildcard_constraints:  **snakebids.get_wildcard_constraints(config['pybids_inputs'])
 
 #---- end snakebids boilerplate ------------------------------------------------
+
 if config['grad_coef'] == False:
     include: 'rules/mprageise_mriqc.smk'
 else:
     include: 'rules/gradcorrect_mprageise_mriqc.smk'
-    
+
 include: 'rules/mriqc_synthstrip_t1w.smk'
 
 if config['use_t2']:

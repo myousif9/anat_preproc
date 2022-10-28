@@ -52,19 +52,18 @@ pybids_inputs:
       - acquisition
       - task
       - run
-
-  # t2w:
-  #   filters:
-  #     suffix: 'T2w'
-  #     extension: '.nii.gz'
-  #     datatype: 'anat'
-  #     acquisition: 'SPACE'
-  #     invalid_filters: 'allow'
-  #   wildcards:
-  #     - subject
-  #     - session
-  #     - task
-  #     - run
+  t2w:
+    filters:
+      suffix: 'T2w'
+      extension: '.nii.gz'
+      datatype: 'anat'
+      acquisition: 'SPACE'
+      invalid_filters: 'allow'
+    wildcards:
+      - subject
+      - session
+      - task
+      - run
   
 
 #this configures the options to save the BIDSLayout

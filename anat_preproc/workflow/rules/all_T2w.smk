@@ -54,6 +54,14 @@ rule all:
         ),
         expand(
             expand(
+                rules.reskstripT2w.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists['t2w']
+        ),
+        expand(
+            expand(
                 rules.mriqc.output.done,
                 allow_missing=True,
             ),
