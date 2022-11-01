@@ -9,12 +9,14 @@ derivatives: False #will search in bids/derivatives if True; can also be path(s)
 #list of analysis levels in the bids app
 analysis_levels: &analysis_levels
  - participant
-
+ - skstrip
 
 #mapping from analysis_level to set of target rules or files
 targets_by_analysis_level:
   participant:
-    - ''  # if '', then the first rule is run
+    - all
+  skstrip:
+    - all_skstrip
 
 #this configures the pybids grabber - create an entry for each type of input you want to grab
 # indexed by name of input
@@ -50,19 +52,18 @@ pybids_inputs:
       - acquisition
       - task
       - run
-
-  # t2w:
-  #   filters:
-  #     suffix: 'T2w'
-  #     extension: '.nii.gz'
-  #     datatype: 'anat'
-  #     acquisition: 'SPACE'
-  #     invalid_filters: 'allow'
-  #   wildcards:
-  #     - subject
-  #     - session
-  #     - task
-  #     - run
+  t2w:
+    filters:
+      suffix: 'T2w'
+      extension: '.nii.gz'
+      datatype: 'anat'
+      acquisition: 'SPACE'
+      invalid_filters: 'allow'
+    wildcards:
+      - subject
+      - session
+      - task
+      - run
   
 
 #this configures the options to save the BIDSLayout
@@ -109,27 +110,45 @@ parse_args:
 
   --derivatives:
     help: 'Path(s) to a derivatives dataset, for folder(s) that contains multiple derivatives datasets (default: %(default)s) '
-    default: False
+    default: false
     nargs: '+'
 
  # custom command-line parameters can then be added, these will get added to the config
  # below is an example to override config['bet_frac']
   --fs_license:
     help: 'Provide path to freesurfer license text file.'
-    default: False
-    required: False
+    default: false
+    required: false
     nargs: 1
   
   --grad_coef:
     help: 'Provide path to gradient correction coefficient file. Gradient correction dis skipped if file is not specified.'
-    default: 'none'
-    required: False
+    default: false
+    required: false
     nargs: 1
+  
+  --fmriprep_opts:
+    help: 'Provide custom fmriprep arguments flags.'
+    default: '--anat-only'
+    required: false
+    nargs: '+'
+  
+  --ciftify_opts:
+    help: 'Provide custom ciftify_recon_all command argument flags.'
+    default: '--resample-to-T1w32k'
+    required: false
+    nargs: '+'
+  
+  --graham:
+    help: 'Use containers on compute canada graham.'
+    default: false
+    action: store_true
+    
 
-  # --use_t2:
-  #   help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
-  #   default: False
-  #   required: False
+  --use_t2:
+    help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'
+    default: false
+    action: store_true
 
 
 #--- workflow specific configuration -- below is just an example:
@@ -137,9 +156,17 @@ parse_args:
 
 #singularity containers
 singularity:
-    afni: 'docker://afni/afni_make_build:AFNI_22.2.10'
-    ciftify: 'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3' 
-    fmriprep: 'docker://nipreps/fmriprep:22.0.1'
-    gradcorrect: 'docker://khanlab/gradcorrect:v0.0.3a'
-    synthstrip: 'docker://freesurfer/synthstrip:1.2'
-
+    graham:
+      afni: '/project/ctb-akhanf/myousif9/containers/afni_make_build_latest.sif'
+      ciftify: '/project/ctb-akhanf/myousif9/containers/fmriprep_ciftify_v1.3.2-2.3.3.sif'
+      fmriprep: '/project/ctb-akhanf/myousif9/containers/fmriprep_22.0.1.sif'
+      gradcorrect: '/project/ctb-akhanf/myousif9/containers/gradcorrect_v0.0.3a.sif'
+      mriqc: '/project/ctb-akhanf/myousif9/containers/mriqc-0.16.1.simg'
+      synthstrip: '/project/ctb-akhanf/myousif9/containers/synthstrip.1.1.sif'
+    docker:
+      afni: 'docker://afni/afni_make_build:AFNI_22.2.10'
+      ciftify: 'docker://tigrlab/fmriprep_ciftify:v1.3.2-2.3.3' 
+      fmriprep: docker://nipreps/fmriprep:22.0.1'
+      gradcorrect: 'docker://khanlab/gradcorrect:v0.0.3a'
+      mriqc: 'docker://poldracklab/mriqc:latest'
+      synthstrip: 'docker://freesurfer/synthstrip:1.1'
