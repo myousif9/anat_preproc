@@ -8,7 +8,7 @@ rule mriqc:
             bids(root="work", suffix="mriqc.done", **inputs.input_wildcards["uni"])
         ),
     group:
-        "subj"
+        "mriqc1"
     container:
         config["singularity"]["graham"]["mriqc"] if config["graham"] else config[
             "singularity"
@@ -16,13 +16,13 @@ rule mriqc:
     threads: 8
     resources:
         mem_mb=16000,
-        time=1440,
+        time=180,
     log:
         bids(root="logs", suffix="mriqc.log", **inputs.input_wildcards["uni"]),
     shell:
         """
         mriqc {input.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}
-        mriqc {params.bids_dir} {params.mriqc_dir} group
+        mriqc {input.bids_dir} {params.mriqc_dir} group
         """
 
 
@@ -51,7 +51,7 @@ rule mprageise:
     threads: 8
     resources:
         mem_mb=16000,
-        time=1440,
+        time=180,
     log:
         bids(root="logs", suffix="3dmprageise.log", **inputs.input_wildcards["uni"]),
     shell:
