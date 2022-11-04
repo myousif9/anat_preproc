@@ -80,7 +80,8 @@ rule reskstripT1w:
 
 rule fmriprep:
     input:
-        skstrip_done=rules.reskstripT1w.output.done,
+        skstrip_T1w_done = rules.reskstripT1w.output.done,
+        skstrip_T2w_done = rules.reskstripT2w.output.done if config['use_t2'] else [],
         fs_license=os.environ["FS_LICENSE"]
         if config["fs_license"] == False
         else config["fs_license"],

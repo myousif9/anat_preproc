@@ -9,7 +9,7 @@ rule mriqc2:
             bids(root="work", suffix="mriqc2.done", **inputs.input_wildcards["uni"])
         ),
     group:
-        "subj"
+        "mriqc2"
     container:
         config["singularity"]["graham"]["mriqc"] if config["graham"] else config[
             "singularity"
