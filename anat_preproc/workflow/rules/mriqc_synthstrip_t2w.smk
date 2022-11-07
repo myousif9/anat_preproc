@@ -3,7 +3,7 @@ rule mriqc_t2w:
         init_file = inputs.input_path["t2w"] if config["grad_coef"] == False else rules.grad_correction.output.done,
     params:
         bids_dir = config['bids_dir'],
-        mriqc_dir=bids(root="derivatives/mriqc", suffix="mriqc_mprageise"),
+        mriqc_dir=bids(root="derivatives/mriqc", suffix="mriqc_T2w"),
     output:
         done=touch(
             bids(root="work", suffix="mriqc_t2w.done", **inputs.input_wildcards["t2w"])
