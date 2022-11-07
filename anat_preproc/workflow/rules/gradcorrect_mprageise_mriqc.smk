@@ -66,12 +66,14 @@ rule mprageise:
         uni=join(
             "derivatives",
             "gradcorrect",
-            *inputs.input_path["uni"].replace(config["bids_dir"], "").split(os.sep)
+            "anat",
+            os.path.basename(inputs.input_path["uni"])
         ),
         inv2=join(
             "derivatives",
             "gradcorrect",
-            *inputs.input_path["inv2"].replace(config["bids_dir"], "").split(os.sep)
+            "anat",
+            os.path.basename(inputs.input_path["inv2"])
         ),
     output:
         mprageised_uni=bids(
