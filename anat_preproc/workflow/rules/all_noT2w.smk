@@ -10,15 +10,7 @@ rule all_skstrip:
         ),
         expand(
             expand(
-                rules.mriqc.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
-        ),
-        expand(
-            expand(
-                rules.mriqc2.output.done,
+                rules.mriqc_t1w.output.done,
                 allow_missing=True,
             ),
             zip,
@@ -39,15 +31,7 @@ rule all:
         ),
         expand(
             expand(
-                rules.mriqc.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
-        ),
-        expand(
-            expand(
-                rules.mriqc2.output.done,
+                rules.mriqc_t1w.output.done,
                 allow_missing=True,
             ),
             zip,

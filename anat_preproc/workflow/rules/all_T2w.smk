@@ -8,6 +8,25 @@ rule all_skstrip:
             zip,
             **inputs.input_zip_lists["uni"]
         ),
+        
+        expand(
+            expand(
+                rules.mriqc_t1w.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists["uni"]
+        ),
+
+        expand(
+            expand(
+                rules.mriqc_t2w.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists["t2w"]
+        ),
+
         expand(
             expand(
                 rules.synthstrip_t2w.output.t2w_skstrip,
@@ -15,22 +34,6 @@ rule all_skstrip:
             ),
             zip,
             **inputs.input_zip_lists["t2w"]
-        ),
-        expand(
-            expand(
-                rules.mriqc.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
-        ),
-        expand(
-            expand(
-                rules.mriqc2.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
         ),
     default_target: True
 
@@ -47,6 +50,22 @@ rule all:
         ),
         expand(
             expand(
+                rules.mriqc_t1w.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists["uni"]
+        ),
+        expand(
+            expand(
+                rules.mriqc_t2w.output.done,
+                allow_missing=True,
+            ),
+            zip,
+            **inputs.input_zip_lists["t2w"]
+        ),
+        expand(
+            expand(
                 rules.synthstrip_t2w.output.t2w_skstrip,
                 allow_missing=True,
             ),
@@ -60,22 +79,6 @@ rule all:
             ),
             zip,
             **inputs.input_zip_lists["t2w"]
-        ),
-        expand(
-            expand(
-                rules.mriqc.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
-        ),
-        expand(
-            expand(
-                rules.mriqc2.output.done,
-                allow_missing=True,
-            ),
-            zip,
-            **inputs.input_zip_lists["uni"]
         ),
         expand(
             expand(

@@ -1,4 +1,4 @@
-rule mriqc2:
+rule mriqc_t1w:
     input:
         mprageise_done=rules.mprageise.output.mprageised_uni,
     params:
@@ -6,10 +6,10 @@ rule mriqc2:
         mriqc_dir=bids(root="derivatives/mriqc", suffix="mriqc_mprageise"),
     output:
         done=touch(
-            bids(root="work", suffix="mriqc2.done", **inputs.input_wildcards["uni"])
+            bids(root="work", suffix="mriqc_t1w.done", **inputs.input_wildcards["uni"])
         ),
     group:
-        "mriqc2"
+        "subj"
     container:
         config["singularity"]["graham"]["mriqc"] if config["graham"] else config[
             "singularity"
@@ -19,7 +19,7 @@ rule mriqc2:
         mem_mb=16000,
         time=180,
     log:
-        bids(root="logs", suffix="mriqc2.log", **inputs.input_wildcards["uni"]),
+        bids(root="logs", suffix="mriqc_t1w.log", **inputs.input_wildcards["uni"]),
     shell:
         """
         mriqc {params.mprageise_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} &> {log}

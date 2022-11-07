@@ -9,7 +9,7 @@ if config["use_t2"]:
             else join(
                 "derivatives",
                 "gradcorrect",
-                *inputs.input_path["t2w"].replace(config["bids_dir"], "").split(os.sep)
+                get_path(inputs.input_path["t2w"])
             ),
             t2w_skstrip=bids(
                 root="derivatives/synthstrip",
