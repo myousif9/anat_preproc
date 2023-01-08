@@ -1,0 +1,15 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: anat_preproc
+message: >-
+  Pipeline for preprocessing anatomical magnetic
+  resonance images.
+type: software
+authors:
+  - given-names: Mohamed
+    family-names: Yousif
+    email: myousif9@uwo.ca
+    affiliation: Western University
+    orcid: 'https://orcid.org/0000-0002-1456-8620'
