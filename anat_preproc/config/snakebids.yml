@@ -52,6 +52,17 @@ pybids_inputs:
       - acquisition
       - task
       - run
+  t1w:
+    filters:
+      suffix: 'T1w'
+      extension: '.nii.gz'
+      datatype: 'anat'
+      invalid_filters: 'allow'
+    wildcards:
+      - subject
+      - session
+      - task
+      - run
   t2w:
     filters:
       suffix: 'T2w'
@@ -127,6 +138,12 @@ parse_args:
     required: false
     nargs: 1
   
+  --fmriprep_run_func:
+    help: 'Run functional preprocessing.'
+    default: false
+    required: false
+    action: store_true
+
   --fmriprep_opts:
     help: 'Provide custom fmriprep arguments flags.'
     default: '--anat-only'
@@ -143,7 +160,11 @@ parse_args:
     help: 'Use containers on compute canada graham.'
     default: false
     action: store_true
-    
+  
+  --gen_t1:
+    help: 'Use 3dMPRAGEise to generate T1w images from UNI and INV2 images.'
+    default: false
+    action: store_true
 
   --use_t2:
     help: 'Toggle for allowing pipeline to include T2w in fMRIprep for freesurfer reconstruction. (currently broken)'

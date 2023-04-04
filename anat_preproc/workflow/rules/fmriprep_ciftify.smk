@@ -19,23 +19,20 @@ if config["use_t2"]:
                 **inputs.input_wildcards["t2w"]
             ),
         output:
-            done=touch(
+            done=temp(
+                touch(
                 bids(
                     root="work",
                     suffix="reskstripT2w.done",
                     **inputs.input_wildcards["t2w"]
                 )
-            ),
+            )),
         container:
             config["singularity"]["graham"]["fmriprep"] if config["graham"] else config[
                 "singularity"
             ]["docker"]["fmriprep"]
         group:
             "subj"
-        threads: 8
-        resources:
-            mem_mb=16000,
-            time=60,
         shell:
             """
             fslmaths {params.t2w} -mul {input.t2w_mask} {params.t2w}
@@ -44,37 +41,33 @@ if config["use_t2"]:
 
 rule reskstripT1w:
     input:
-        t1w_mask=rules.synthstrip_uni.output.uni_mask,
+        t1w_mask=rules.synthstrip_t1w.output.t1w_mask,
     params:
-        t1w=rules.mprageise.output.mprageised_uni,
-        uni_skstrip=bids(
+        t1w=rules.mprageise.output.mprageised_t1w if config["gen_t1"] else inputs.input_path['t1w'],
+        t1w_skstrip=bids(
             root="derivatives/synthstrip",
             datatype="anat",
             desc="synthstrip",
             suffix="T1w.nii.gz",
-            **inputs.input_wildcards["uni"]
+            **inputs.input_wildcards[zip_list_key_t1w]
         ),
     output:
-        done=touch(
+        done=temp(touch(
             bids(
                 root="work",
                 suffix="reskstripT1w.done",
-                **inputs.input_wildcards["uni"]
+                **inputs.input_wildcards[zip_list_key_t1w]
             )
-        ),
+        )),
     container:
         config["singularity"]["graham"]["fmriprep"] if config["graham"] else config[
             "singularity"
         ]["docker"]["fmriprep"]
     group:
         "subj"
-    threads: 8
-    resources:
-        mem_mb=16000,
-        time=60,
     shell:
         """
-        fslmaths {params.t1w} -mul {input.t1w_mask} {params.uni_skstrip}
+        fslmaths {params.t1w} -mul {input.t1w_mask} {params.t1w_skstrip}
         """
 
 
@@ -101,9 +94,9 @@ rule fmriprep:
         if config["graham"]
         else config["singularity"]["docker"]["fmriprep"],
     output:
-        done=touch(
-            bids(root="work", suffix="fmriprep.done", **inputs.input_wildcards["uni"])
-        ),
+        done=temp(touch(
+            bids(root="work", suffix="fmriprep.done", **inputs.input_wildcards[zip_list_key_t1w])
+        )),
     group:
         "subj"
     threads: 8
@@ -111,7 +104,7 @@ rule fmriprep:
         mem_mb=16000,
         time=1440,
     log:
-        bids(root="logs", suffix="fmriprep.log", **inputs.input_wildcards["uni"]),
+        bids(root="logs", suffix="fmriprep.log", **inputs.input_wildcards[zip_list_key_t1w]),
     shell:
         """
         cp -n {params.dataset_description} {params.synthstrip_dir}
@@ -140,9 +133,9 @@ rule ciftify_recon_all:
         ciftify_outdir=bids(root="derivatives", suffix="ciftify"),
         ciftify_opts=config["ciftify_opts"],
     output:
-        done=touch(
-            bids(root="work", suffix="ciftify.done", **inputs.input_wildcards["uni"])
-        ),
+        done=temp(touch(
+            bids(root="work", suffix="ciftify.done", **inputs.input_wildcards[zip_list_key_t1w])
+        )),
     container:
         config["singularity"]["graham"]["ciftify"] if config["graham"] else config[
             "singularity"
@@ -154,7 +147,7 @@ rule ciftify_recon_all:
         mem_mb=16000,
         time=1440,
     log:
-        bids(root="logs", suffix="ciftifyreconall.log", **inputs.input_wildcards["uni"]),
+        bids(root="logs", suffix="ciftifyreconall.log", **inputs.input_wildcards[zip_list_key_t1w]),
     shell:
         """
         ciftify_recon_all {params.ciftify_opts} --ciftify-work-dir '{params.ciftify_outdir}' --fs-subjects-dir '{params.freesurfer_dir}' --fs-license '{input.fs_license}' --n_cpus '{threads}' 'sub-{wildcards.subject}' &> {log}

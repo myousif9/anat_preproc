@@ -5,9 +5,9 @@ rule mriqc_t2w:
         bids_dir = config['bids_dir'],
         mriqc_dir=bids(root="derivatives/mriqc", suffix="mriqc_T2w"),
     output:
-        done=touch(
+        done=temp(touch(
             bids(root="work", suffix="mriqc_t2w.done", **inputs.input_wildcards["t2w"])
-        ),
+        )),
     group:
         "subj"
     container:
@@ -18,11 +18,9 @@ rule mriqc_t2w:
     resources:
         mem_mb=16000,
         time=180,
-    log:
-        bids(root="logs", suffix="mriqc_t2w.log", **inputs.input_wildcards["t2w"]),
     shell:
         """
-        mriqc {params.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T2w &> {log}
+        mriqc {params.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T2w --verbose-reports
         mriqc {params.bids_dir} {params.mriqc_dir} group
         """
 

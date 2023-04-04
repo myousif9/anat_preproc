@@ -14,6 +14,13 @@ pybids_in = config["pybids_inputs"]
 if config["use_t2"] == False:
     del pybids_in["t2w"]
 
+if config['gen_t1'] == False:
+    del pybids_in['uni']
+    del pybids_in['inv2']
+else:
+    del pybids_in["t1w"]
+
+
 # Get input wildcards
 inputs = snakebids.generate_inputs(
     bids_dir=config["bids_dir"],
@@ -37,7 +44,9 @@ wildcard_constraints:
 get_sub_idx = lambda path_in: [ idx for idx, item in enumerate(path_in.split(os.sep)) if 'sub' in item ][0]
 get_path = lambda path_in: str(os.sep).join(path_in.split(os.sep)[get_sub_idx(path_in):])
 
-include: "rules/gradcorrect_mprageise_mriqc.smk"
+zip_list_key_t1w = "uni" if config['gen_t1'] else "t1w"
+
+include: "rules/gradcorrect_mprageise.smk"
 
 
 include: "rules/mriqc_synthstrip_t1w.smk"
@@ -49,10 +58,11 @@ if config["use_t2"]:
 
 include: "rules/fmriprep_ciftify.smk"
 
+include: "rules/target_rule.smk"
 
-if config["use_t2"]:
-    include: "rules/all_T2w.smk"
+# if config["use_t2"]:
+#     include: "rules/all_T2w.smk"
 
 
-else:
-    include: "rules/all_noT2w.smk"
+# else:
+#     include: "rules/all_noT2w.smk"
