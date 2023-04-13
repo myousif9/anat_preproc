@@ -20,7 +20,7 @@ rule mriqc_t2w:
         time=180,
     shell:
         """
-        mriqc {params.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T2w --verbose-reports
+        mriqc {params.bids_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T2w --no-sub --verbose-reports
         mriqc {params.bids_dir} {params.mriqc_dir} group
         """
 

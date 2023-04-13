@@ -23,7 +23,7 @@ rule mriqc_t1w:
         bids(root="logs", suffix="mriqc_t1w.log", **inputs.input_wildcards[zip_list_key_t1w]),
     shell:
         """
-        mriqc {params.t1w_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T1w --verbose-reports &> {log}
+        mriqc {params.t1w_dir} {params.mriqc_dir} participant --participant-label {wildcards.subject} --modalities T1w --no-sub --verbose-reports &> {log}
         mriqc {params.t1w_dir} {params.mriqc_dir} group
         """
 
