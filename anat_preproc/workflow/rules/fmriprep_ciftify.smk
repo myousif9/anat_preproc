@@ -79,16 +79,12 @@ rule fmriprep:
         if config["fs_license"] == False
         else config["fs_license"],
     params:
-        synthstrip_dir=bids(root="derivatives", suffix="synthstrip"),
-        fmriprep_outdir=bids(root="derivatives", suffix="fmriprep"),
-        freesurfer_dir=bids(root="derivatives", suffix="freesurfer"),
+        synthstrip_dir=join(config['output_dir'], bids(root="derivatives", suffix="synthstrip")),
+        fmriprep_outdir=join(config['output_dir'], bids(root="derivatives", suffix="fmriprep")),
         dataset_description=join(
             workflow.basedir, "../resources/dataset_description.json"
         ),
-        work_directory=bids(
-            root="work",
-            suffix="fmriprep",
-        ),
+        work_directory=join(config['output_dir'], bids( root="work",suffix="fmriprep")),
         fmriprep_opts=config["fmriprep_opts"],
         container=config["singularity"]["graham"]["fmriprep"]
         if config["graham"]
